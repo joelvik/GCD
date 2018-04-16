@@ -8,14 +8,18 @@ The sensor signals (accelerometer and gyroscope) were pre-processed by applying 
 
 Transformations or work that performed to clean up the data
 ------------------------------------------------------------------
-#Download zip file from given link fileurl = 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+# Download zip file from given link.
+
+fileurl = 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
 if (!file.exists('./UCI HAR Dataset.zip')){
 download.file(fileurl,'./UCI HAR Dataset.zip', mode = 'wb')
 
-#unzip it to designated folder
+# unzip it to designated folder.
+
 unzip("UCI HAR Dataset.zip", exdir = getwd())
 
-#Read features and convert it into a single data frame
+# Read features and convert it into a single data frame.
+
 feat <- as.character(feat[,2])
 datax <- read.table('./UCI HAR Dataset/train/X_train.txt')
 activitydata <- read.csv(./UCI HAR Dataset/train/y_train.txt', header = FALSE, sep = ' ')
@@ -31,20 +35,24 @@ datatest <- data.frame
 datatest <- data.frame(testsubject,testactivity,testdata)
 names(datatest) <- c(c('subject', 'activity'), feat)
 
-#Merges all data into one dataset
+# Merges all data into one dataset.
+
 alldata <- rbind(datat,datatest)
 
-#Extraction of Mean and standard deviation for each measurement.
+# Extraction of Mean and standard deviation for each measurement.
+
 mean_std <- grep('mean|std', feat)
 datas <- alldata[,c(1,2,mean_std + 2)]
 
-#Name the activities in the data set
+# Name the activities in the data set.
+
 labelactivity <- read.table('./UCI HAR Dataset/activity_labels.txt', header = FALSE)
 labelactivity <- as.character(labelactivity[,2])
 data.sub$activity <- labelactivity[data.sub$activity]
 datas$activity <- labelactivity[datas$activity]
 
-#labeling the data set with descriptive variable names
+# labeling the data set with descriptive variable names.
+
 name.new <- names(datas)
 name.new <- gsub("[(][)]", "", name.new)
 name.new <- gsub("^t", "TimeDomain_", name.new)
@@ -57,7 +65,8 @@ name.new <- gsub("-std-", "_StandardDeviation_", name.new)
 name.new <- gsub("-", "_", name.new)
 names(datas) <- name.new
 
-#independent tidy data set with the average of each variable for each activity and each subject.
+# independent tidy data set with the average of each variable for each activity and each subject.
+
 tidydata <-  aggregate(datas[,3:81], by = list(activity = datas$activity, subject = datas$subject),FUN = mean)
 write.table(x = tidydata, file = "tidydata.txt", row.names = FALSE)
 
