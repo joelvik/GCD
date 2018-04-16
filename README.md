@@ -24,12 +24,10 @@ You should create one R script called run_analysis.R that does the following.
    label activity.
    
    
-5  From the data set in step 4, creates a second, . . .  independent tidy data set with the average of        each variable for each activity and each subject.
- - Generates output as tidydata.txt
+5  From the data set in step 4, creates a second, . . .  independent tidy data set with the average of each variable for each activity and each subject. - Generates output as tidydata.txt
 
 
 ## Script for Getting and Cleaning Data
-
 
 # Download zip file from given link and unzip it to designated folder
 library(data.table)
@@ -39,7 +37,7 @@ if (!file.exists('./UCI HAR Dataset.zip')){
   unzip("UCI HAR Dataset.zip", exdir = getwd())
 }
 
-#Reads features and converts it into a single data frame
+# Reads features and converts it into a single data frame
 feat <- read.csv('./UCI HAR Dataset/features.txt', header = FALSE, sep = ' ')
 feat <- as.character(feat[,2])
 datax <- read.table('./UCI HAR Dataset/train/X_train.txt')
@@ -56,20 +54,20 @@ testsubject <- read.csv('./UCI HAR Dataset/test/subject_test.txt', header = FALS
 datatest <- data.frame(testsubject,testactivity,testdata)
 names(datatest) <- c(c('subject', 'activity'), feat)
 
-#Merges all data into one dataset
+# Merges all data into one dataset
 alldata <- rbind(datat,datatest)
 
-##Extraction of Mean and standard deviation for each measurement.
+## Extraction of Mean and standard deviation for each measurement.
 mean_std <- grep('mean|std', feat)
 datas <- alldata[,c(1,2,mean_std + 2)]
 
-#Name the activities in the data set
+# Name the activities in the data set
 
 labelactivity <- read.table('./UCI HAR Dataset/activity_labels.txt', header = FALSE)
 labelactivity <- as.character(labelactivity[,2])
 datas$activity <- labelactivity[datas$activity]
 
-#labeling the data set with descriptive variable names
+# labeling the data set with descriptive variable names
 name.new <- names(datas)
 name.new <- gsub("[(][)]", "", name.new)
 name.new <- gsub("^t", "TimeDomain_", name.new)
@@ -82,6 +80,6 @@ name.new <- gsub("-std-", "_StandardDeviation_", name.new)
 name.new <- gsub("-", "_", name.new)
 names(datas) <- name.new
 
-#independent tidy data set with the average of each variable for each activity and each subject.
+# independent tidy data set with the average of each variable for each activity and each subject.
 tidydata <-  aggregate(datas[,3:81], by = list(activity = datas$activity, subject = datas$subject),FUN = mean)
 write.table(x = tidydata, file = "tidydata.txt", row.names = FALSE)
